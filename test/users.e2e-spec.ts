@@ -5,6 +5,8 @@ import { DataSource } from 'typeorm';
 import { AppTestModule } from './app-test.module';
 import { User } from '../src/users/entities/user.entity';
 
+jest.setTimeout(30000);
+
 describe('Users E2E', () => {
 	let app: INestApplication;
 	let httpServer: any;

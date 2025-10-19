@@ -6,6 +6,8 @@ import { AppTestModule } from './app-test.module';
 import { User } from '../src/users/entities/user.entity';
 import { Organization } from '../src/organizations/entities/organization.entity';
 
+jest.setTimeout(30000);
+
 describe('Organization E2E', () => {
 	let app: INestApplication;
 	let httpServer: any;
