@@ -7,39 +7,40 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private readonly usersRepository: Repository<User>,
-  ) {}
+	constructor(
+		@InjectRepository(User)
+		private readonly usersRepository: Repository<User>,
+	) {}
 
-  create(createUserDto: CreateUserDto) {
-    return this.usersRepository.save(createUserDto);
-  }
+	create(createUserDto: CreateUserDto) {
+		return this.usersRepository.save(createUserDto);
+	}
 
-  findOne(email: string) {
-    return this.usersRepository.findOne({ where: { email } });
-  }
+	findOne(email: string) {
+		return this.usersRepository.findOne({ where: { email } });
+	}
 
-  async findById(id: string) {
-    const user = await this.usersRepository.findOne({ where: { id } });
-    if (user) {
-      const { password, ...res } = user;
-      return res;
-    }
-    return null;
-  }
+	async findById(id: string) {
+		const user = await this.usersRepository.findOne({ where: { id } });
+		if (user) {
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			const { password, ...res } = user;
+			return res;
+		}
+		return null;
+	}
 
-  update(id: string, updateUserDto: UpdateUserDto) {
-    return this.usersRepository.update(id, updateUserDto);
-  }
+	update(id: string, updateUserDto: UpdateUserDto) {
+		return this.usersRepository.update(id, updateUserDto);
+	}
 
-  async remove(id: string) {
-    const existing = await this.usersRepository.findOne({ where: { id }});
+	async remove(id: string) {
+		const existing = await this.usersRepository.findOne({ where: { id } });
 
-    if (!existing) {
-      throw new NotFoundException('User not found');
-    }
+		if (!existing) {
+			throw new NotFoundException('User not found');
+		}
 
-    return this.usersRepository.remove(existing);
-  }
+		return this.usersRepository.remove(existing);
+	}
 }

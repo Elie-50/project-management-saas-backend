@@ -3,19 +3,19 @@ import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 
-@Controller('api/auth')
+@Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+	constructor(private authService: AuthService) {}
 
-  @HttpCode(HttpStatus.OK)
-  @Post('login')
-  signIn(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
-  }
+	@HttpCode(HttpStatus.OK)
+	@Post('login')
+	signIn(@Body() loginDto: LoginDto) {
+		return this.authService.login(loginDto);
+	}
 
-  @HttpCode(HttpStatus.CREATED)
-  @Post('signup')
-  async signUp(@Body() userData: CreateUserDto) {
-    return this.authService.signUp(userData);
-  }
+	@HttpCode(HttpStatus.CREATED)
+	@Post('signup')
+	async signUp(@Body() userData: CreateUserDto) {
+		return this.authService.signUp(userData);
+	}
 }

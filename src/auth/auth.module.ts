@@ -9,15 +9,15 @@ dotenv.config();
 const JWT_SECRET: string = process.env.JWT_SECRET!;
 
 @Module({
-  imports: [
-    UsersModule,
-    JwtModule.register({
-      global: true,
-      secret: JWT_SECRET,
-      signOptions: { expiresIn: '1d' },
-    }),
-  ],
-  controllers: [AuthController],
-  providers: [AuthService],
+	imports: [
+		UsersModule,
+		JwtModule.register({
+			global: true,
+			secret: JWT_SECRET,
+			signOptions: { expiresIn: '1d' },
+		}),
+	],
+	controllers: [AuthController],
+	providers: [AuthService],
 })
 export class AuthModule {}
