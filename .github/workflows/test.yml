@@ -9,6 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: .env
 
     strategy:
       matrix:
@@ -30,4 +31,6 @@ jobs:
         run: npm run test
 
       - name: Run e2e tests
+        env:
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
         run: npm run test:e2e
