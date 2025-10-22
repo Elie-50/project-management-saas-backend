@@ -3,7 +3,6 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
-import { UpdateResult } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 
 describe('UsersController', () => {
@@ -72,13 +71,12 @@ describe('UsersController', () => {
 		it('should update the current user', async () => {
 			const updateDto: UpdateUserDto = { firstName: 'Updated' };
 
-			const updateResult: UpdateResult = {
-				affected: 1,
-				raw: [],
-				generatedMaps: [],
+			const updateResult = {
+				id: 'id-123',
+				...updateDto,
 			};
 
-			usersService.update.mockResolvedValueOnce(updateResult);
+			usersService.update.mockResolvedValueOnce(updateResult as any);
 
 			const result = await controller.update(mockRequest, updateDto);
 

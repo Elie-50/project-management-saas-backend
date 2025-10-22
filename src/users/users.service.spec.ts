@@ -4,7 +4,6 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
-import { UpdateResult } from 'typeorm';
 
 describe('UsersService', () => {
 	let service: UsersService;
@@ -95,13 +94,12 @@ describe('UsersService', () => {
 		it('should update the user', async () => {
 			const updateUserDto = { firstName: 'Updated' };
 
-			const updateResult: UpdateResult = {
-				affected: 1,
-				raw: [],
-				generatedMaps: [],
-			};
+			const updateResult: User = {
+				id: 'id-user',
+				...updateUserDto,
+			} as User;
 
-			usersRepository.update.mockResolvedValue(updateResult);
+			jest.spyOn(service, 'findById').mockResolvedValue(updateResult as any);
 
 			const result = await service.update('1', updateUserDto);
 

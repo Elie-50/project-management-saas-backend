@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 
+type SafeUserResponse = Omit<User, 'password'>;
+
 @Injectable()
 export class UsersService {
 	constructor(
@@ -20,18 +22,25 @@ export class UsersService {
 		return this.usersRepository.findOne({ where: { email } });
 	}
 
-	async findById(id: string) {
+	async findById(id: string): Promise<SafeUserResponse> {
 		const user = await this.usersRepository.findOne({ where: { id } });
-		if (user) {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			const { password, ...res } = user;
-			return res;
+
+		if (!user) {
+			throw new NotFoundException('User Not Found');
 		}
-		return null;
+
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const { password, ...res } = user;
+		return res;
 	}
 
-	update(id: string, updateUserDto: UpdateUserDto) {
-		return this.usersRepository.update(id, updateUserDto);
+	async update(
+		id: string,
+		updateUserDto: UpdateUserDto,
+	): Promise<SafeUserResponse> {
+		await this.usersRepository.update(id, updateUserDto);
+
+		return this.findById(id);
 	}
 
 	async remove(id: string) {

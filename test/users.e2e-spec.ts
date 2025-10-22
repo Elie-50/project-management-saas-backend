@@ -90,11 +90,14 @@ describe('Users E2E', () => {
 		it('should update the user info', async () => {
 			const { token, user } = await registerAndLogin();
 
-			await request(httpServer)
+			const res = await request(httpServer)
 				.patch(meUrl)
 				.set('Authorization', `Bearer ${token}`)
 				.send(updatedUserDto)
 				.expect(200);
+
+			expect(res.body?.id).toBeDefined();
+			expect(res.body?.firstName).toBe('Updated');
 
 			const updatedUser = await dataSource
 				.getRepository(User)
