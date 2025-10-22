@@ -31,12 +31,12 @@ export class AuthService {
 		const user: User | null = await this.usersService.findOne(email);
 
 		if (!user || !user?.password) {
-			throw new BadRequestException();
+			throw new BadRequestException('Invalid email or password');
 		}
 
 		const valid = await this.comparePasswords(password, user.password);
 		if (!valid) {
-			throw new UnauthorizedException();
+			throw new UnauthorizedException('Invalid email or password');
 		}
 		const payload: JwtPayload = { id: user.id };
 
@@ -64,7 +64,7 @@ export class AuthService {
 			const { password, ...result } = user;
 			return result;
 		} catch {
-			throw new BadRequestException();
+			throw new BadRequestException('Username or email already exists');
 		}
 	}
 

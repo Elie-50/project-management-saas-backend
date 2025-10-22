@@ -1,9 +1,13 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+	BadRequestException,
+	Injectable,
+	NotFoundException,
+} from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Organization } from './entities/organization.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 
 @Injectable()
@@ -27,7 +31,7 @@ export class OrganizationsService {
 		});
 	}
 
-	async findOne(id: string, ownerId: string) {
+	async findOne(id: string, ownerId: string): Promise<Organization> {
 		const org = await this.organizationsRepo.findOne({
 			where: { id, owner: { id: ownerId } },
 		});
@@ -44,16 +48,15 @@ export class OrganizationsService {
 		ownerId: string,
 		updateOrganizationDto: UpdateOrganizationDto,
 	) {
-		const update: UpdateResult = await this.organizationsRepo.update(
-			{ id, owner: { id: ownerId } },
-			updateOrganizationDto,
-		);
+		const organization: Organization = await this.findOne(id, ownerId);
 
-		if (update.affected == 0) {
-			throw new NotFoundException('Organization not found');
+		if (!updateOrganizationDto.name) {
+			throw new BadRequestException('Name must be provided');
 		}
 
-		return update;
+		organization.name = updateOrganizationDto.name;
+
+		return this.organizationsRepo.save(organization);
 	}
 
 	async remove(id: string, ownerId: string) {

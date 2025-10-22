@@ -4,8 +4,8 @@ import { OrganizationsService } from './organizations.service';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { User } from '../users/entities/user.entity';
-import { UpdateResult } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { Organization } from './entities/organization.entity';
 
 describe('OrganizationsController', () => {
 	let controller: OrganizationsController;
@@ -119,11 +119,13 @@ describe('OrganizationsController', () => {
 	describe('update', () => {
 		it('should call service.update with correct args', async () => {
 			const dto: UpdateOrganizationDto = { name: 'Updated Org' };
-			const expected: UpdateResult = {
-				affected: 1,
-				raw: [],
-				generatedMaps: [],
-			};
+			const ownerId = 'owner-123';
+			const expected = {
+				id: 'org-123',
+				createdAt: new Date(),
+				owner: { id: ownerId } as User,
+				...dto,
+			} as Organization;
 
 			service.update.mockResolvedValue(expected);
 

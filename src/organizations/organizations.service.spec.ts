@@ -2,7 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { OrganizationsService } from './organizations.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Organization } from './entities/organization.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository } from 'typeorm';
 import { NotFoundException } from '@nestjs/common';
 import { CreateOrganizationDto } from './dto/create-organization.dto';
 import { UpdateOrganizationDto } from './dto/update-organization.dto';
@@ -116,24 +116,25 @@ describe('OrganizationsService', () => {
 
 	describe('update', () => {
 		it('should call update with correct parameters', async () => {
-			const dto: UpdateOrganizationDto = { name: 'Updated Org' };
+			const dto: UpdateOrganizationDto = { name: 'Updated Org' as string };
 			const ownerId = 'user-123';
 
-			const updateResult: UpdateResult = {
-				affected: 1,
-				raw: [],
-				generatedMaps: [],
+			const org: Organization = {
+				id: 'org-123',
+				createdAt: new Date(),
+				owner: { id: ownerId } as User,
+				name: 'Org',
 			};
 
-			repo.update.mockResolvedValue(updateResult);
+			jest.spyOn(service, 'findOne').mockResolvedValue(org as any);
+
+			const newOrg: Organization = { ...org, name: dto?.name } as Organization;
+			repo.save.mockResolvedValue(newOrg);
 
 			const result = await service.update('org-1', ownerId, dto);
 
-			expect(repo.update).toHaveBeenCalledWith(
-				{ id: 'org-1', owner: { id: ownerId } },
-				dto,
-			);
-			expect(result).toEqual(updateResult);
+			expect(repo.save).toHaveBeenCalledWith(newOrg);
+			expect(result).toEqual(newOrg);
 		});
 	});
 

@@ -188,11 +188,14 @@ describe('Organization E2E', () => {
 				.getRepository(Organization)
 				.save({ name: `Org-1`, owner: user });
 
-			await request(httpServer)
+			const result = await request(httpServer)
 				.patch(`${organizationUrl}/${org1.id}`)
 				.set('Authorization', `Bearer ${token}`)
 				.send({ name: 'New-Org' })
 				.expect(200);
+
+			expect(result.body?.name).toBe('New-Org');
+			expect(result.body?.id).toBeDefined();
 
 			// should update the database
 			const dbOrg = await dataSource
