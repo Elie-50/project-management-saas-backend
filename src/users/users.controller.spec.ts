@@ -4,10 +4,14 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
+import { MembershipsService } from '../memberships/memberships.service';
+import { Organization } from '../organizations/entities/organization.entity';
+import { Membership } from '../memberships/entities/membership.entity';
 
 describe('UsersController', () => {
 	let controller: UsersController;
 	let usersService: jest.Mocked<UsersService>;
+	let membershipsService: jest.Mocked<MembershipsService>;
 
 	const mockUser: User = {
 		id: 'user-id-123',
@@ -24,19 +28,28 @@ describe('UsersController', () => {
 		user: { id: mockUser.id },
 	} as any;
 
-	beforeEach(async () => {
-		const mockUsersService = {
-			findById: jest.fn(),
-			update: jest.fn(),
-			remove: jest.fn(),
-		};
+	const mockUsersService = {
+		findById: jest.fn(),
+		update: jest.fn(),
+		remove: jest.fn(),
+		findAllMemberships: jest.fn(),
+	};
 
+	const mockMembershipService = {
+		findAllMemberships: jest.fn(),
+	};
+
+	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [UsersController],
 			providers: [
 				{
 					provide: UsersService,
 					useValue: mockUsersService,
+				},
+				{
+					provide: MembershipsService,
+					useValue: mockMembershipService,
 				},
 				{
 					provide: JwtService,
@@ -50,6 +63,7 @@ describe('UsersController', () => {
 
 		controller = module.get<UsersController>(UsersController);
 		usersService = module.get(UsersService);
+		membershipsService = module.get(MembershipsService);
 	});
 
 	it('should be defined', () => {
@@ -93,6 +107,27 @@ describe('UsersController', () => {
 
 			expect(usersService.remove).toHaveBeenCalledWith(mockUser.id);
 			expect(result).toEqual(mockUser);
+		});
+	});
+
+	describe('findMemberships', () => {
+		it('should call service find memberships', async () => {
+			const memberships = [
+				{
+					id: 'id-123',
+					organization: {
+						id: 'org-123',
+					} as Organization,
+				},
+			] as Membership[];
+			membershipsService.findAllMemberships.mockResolvedValueOnce(memberships);
+
+			const result = await controller.findMemberships(mockRequest);
+
+			expect(membershipsService.findAllMemberships).toHaveBeenCalledWith(
+				mockUser.id,
+			);
+			expect(result).toEqual(memberships);
 		});
 	});
 });

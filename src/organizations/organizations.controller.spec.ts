@@ -6,10 +6,12 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Organization } from './entities/organization.entity';
+import { MembershipsService } from '../memberships/memberships.service';
 
 describe('OrganizationsController', () => {
 	let controller: OrganizationsController;
 	let service: jest.Mocked<OrganizationsService>;
+	let membershipService: jest.Mocked<MembershipsService>;
 
 	const mockUser: User = {
 		id: 'user-id-123',
@@ -34,6 +36,12 @@ describe('OrganizationsController', () => {
 		remove: jest.fn(),
 	};
 
+	const mockMembershipService = {
+		create: jest.fn(),
+		remove: jest.fn(),
+		findAllMembers: jest.fn(),
+	};
+
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [OrganizationsController],
@@ -41,6 +49,10 @@ describe('OrganizationsController', () => {
 				{
 					provide: OrganizationsService,
 					useValue: mockService,
+				},
+				{
+					provide: MembershipsService,
+					useValue: mockMembershipService,
 				},
 				{
 					provide: JwtService,
@@ -54,6 +66,7 @@ describe('OrganizationsController', () => {
 
 		controller = module.get<OrganizationsController>(OrganizationsController);
 		service = module.get(OrganizationsService);
+		membershipService = module.get(MembershipsService);
 	});
 
 	afterEach(() => {
@@ -151,6 +164,60 @@ describe('OrganizationsController', () => {
 
 			expect(service.remove).toHaveBeenCalledWith('org-1', mockUser.id);
 			expect(result).toEqual(expected);
+		});
+	});
+
+	describe('addMember', () => {
+		it('should call membershipService.create with correct args', async () => {
+			const dto = { userId: 'user-123' };
+			const orgId: string = 'org-123';
+			const expected = {
+				id: 'id',
+				user: { id: 'user-123' } as User,
+				organization: { id: 'org-123' } as Organization,
+				joinedAt: new Date(),
+			};
+
+			membershipService.create.mockResolvedValue(expected);
+
+			const result = await controller.addMember(orgId, dto);
+
+			expect(membershipService.create).toHaveBeenCalledWith({
+				organizationId: orgId,
+				userId: dto.userId,
+			});
+
+			expect(result).toEqual(expected);
+		});
+	});
+
+	describe('findAllMembers', () => {
+		it('should return all organization members', async () => {
+			const expected = [
+				{
+					id: 'id-123',
+					username: 'user',
+					email: 'user@example.com',
+					joinedAt: new Date(),
+				},
+			];
+
+			const orgId: string = 'org-123';
+
+			membershipService.findAllMembers.mockResolvedValue(expected);
+
+			const result = await controller.findAllMembers(orgId);
+
+			expect(membershipService.findAllMembers).toHaveBeenCalledWith(orgId);
+			expect(result).toEqual(expected);
+		});
+	});
+
+	describe('removeMember', () => {
+		it('should call membershipService.remove with correct args', async () => {
+			await controller.removeMember('org-1', 'user-1');
+
+			expect(membershipService.remove).toHaveBeenCalledWith('org-1', 'user-1');
 		});
 	});
 });

@@ -6,7 +6,9 @@ import {
 	JoinColumn,
 	ManyToOne,
 	PrimaryGeneratedColumn,
+	OneToMany,
 } from 'typeorm';
+import { Membership } from '../../memberships/entities/membership.entity';
 
 @Entity({ name: 'organizations' })
 export class Organization {
@@ -19,6 +21,9 @@ export class Organization {
 	@ManyToOne(() => User, (user) => user.organizations, { eager: false })
 	@JoinColumn({ name: 'owner_id' })
 	owner: User;
+
+	@OneToMany(() => Membership, (membership) => membership.organization)
+	memberships?: Membership[];
 
 	@CreateDateColumn()
 	createdAt: Date;

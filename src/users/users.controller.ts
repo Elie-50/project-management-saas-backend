@@ -14,6 +14,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { JwtPayload } from '../auth/auth.service';
+import { MembershipsService } from '../memberships/memberships.service';
 
 interface AuthRequest extends Request {
 	user: JwtPayload;
@@ -21,7 +22,10 @@ interface AuthRequest extends Request {
 
 @Controller('users')
 export class UsersController {
-	constructor(private readonly usersService: UsersService) {}
+	constructor(
+		private readonly usersService: UsersService,
+		private readonly membershipService: MembershipsService,
+	) {}
 
 	@HttpCode(HttpStatus.OK)
 	@UseGuards(AuthGuard)
@@ -42,5 +46,12 @@ export class UsersController {
 	@Delete('me')
 	remove(@Req() req: AuthRequest) {
 		return this.usersService.remove(req.user.id);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthGuard)
+	@Get('me/memberships')
+	findMemberships(@Req() req: AuthRequest) {
+		return this.membershipService.findAllMemberships(req.user.id);
 	}
 }

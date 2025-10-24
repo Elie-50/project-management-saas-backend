@@ -1,3 +1,4 @@
+import { Membership } from '../../memberships/entities/membership.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
 import {
 	Entity,
@@ -32,6 +33,9 @@ export class User {
 		cascade: true,
 	})
 	organizations?: Organization[];
+
+	@OneToMany(() => Membership, (membership) => membership.user)
+	memberships?: Membership[];
 
 	@CreateDateColumn({ name: 'created_at' })
 	createdAt: Date;

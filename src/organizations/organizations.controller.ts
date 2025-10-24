@@ -17,6 +17,7 @@ import { UpdateOrganizationDto } from './dto/update-organization.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { JwtPayload } from '../auth/auth.service';
+import { MembershipsService } from '../memberships/memberships.service';
 
 interface AuthRequest extends Request {
 	user: JwtPayload;
@@ -24,7 +25,10 @@ interface AuthRequest extends Request {
 
 @Controller('organizations')
 export class OrganizationsController {
-	constructor(private readonly organizationsService: OrganizationsService) {}
+	constructor(
+		private readonly organizationsService: OrganizationsService,
+		private readonly membershipService: MembershipsService,
+	) {}
 
 	@HttpCode(HttpStatus.CREATED)
 	@UseGuards(AuthGuard)
@@ -70,5 +74,26 @@ export class OrganizationsController {
 	@Delete(':id')
 	remove(@Param('id') id: string, @Req() req: AuthRequest) {
 		return this.organizationsService.remove(id, req.user.id);
+	}
+
+	@HttpCode(HttpStatus.CREATED)
+	@UseGuards(AuthGuard)
+	@Post(':orgId/members')
+	addMember(@Param('orgId') orgId: string, @Body() body: { userId: string }) {
+		return this.membershipService.create({ organizationId: orgId, ...body });
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthGuard)
+	@Get(':orgId/members')
+	findAllMembers(@Param('orgId') orgId: string) {
+		return this.membershipService.findAllMembers(orgId);
+	}
+
+	@HttpCode(HttpStatus.NO_CONTENT)
+	@UseGuards(AuthGuard)
+	@Delete(':orgId/members/:userId')
+	removeMember(@Param('orgId') orgId: string, @Param('userId') userId: string) {
+		return this.membershipService.remove(orgId, userId);
 	}
 }

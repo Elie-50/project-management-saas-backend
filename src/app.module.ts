@@ -6,6 +6,8 @@ import { User } from './users/entities/user.entity';
 import { AuthModule } from './auth/auth.module';
 import { OrganizationsModule } from './organizations/organizations.module';
 import { Organization } from './organizations/entities/organization.entity';
+import { MembershipsModule } from './memberships/memberships.module';
+import { Membership } from './memberships/entities/membership.entity';
 
 @Module({
 	imports: [
@@ -23,12 +25,13 @@ import { Organization } from './organizations/entities/organization.entity';
 				password: config.get<string>('DB_PASS'),
 				database: config.get<string>('DB_NAME'),
 				synchronize: config.get<boolean>('SYNCHRONIZE'),
-				entities: [User, Organization],
+				entities: [User, Organization, Membership],
 			}),
 		}),
 		UsersModule,
 		AuthModule,
 		OrganizationsModule,
+		MembershipsModule,
 	],
 	controllers: [],
 	providers: [],
