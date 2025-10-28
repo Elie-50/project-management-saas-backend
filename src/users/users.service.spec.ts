@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { NotFoundException } from '@nestjs/common';
@@ -15,6 +15,7 @@ describe('UsersService', () => {
 			findOne: jest.fn(),
 			update: jest.fn(),
 			remove: jest.fn(),
+			findAndCount: jest.fn(),
 		};
 
 		const module: TestingModule = await Test.createTestingModule({
@@ -132,6 +133,44 @@ describe('UsersService', () => {
 				where: { id: '1' },
 			});
 			expect(usersRepository.remove).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('search', () => {
+		it('should find users', async () => {
+			const users = [
+				{ id: '1', email: 'test@example.com' },
+				{ id: '2', email: 'email@example.com' },
+			] as User[];
+
+			const total = 2;
+			const page = 1;
+			const pageCount = 1;
+
+			const response = {
+				data: users,
+				total,
+				page,
+				pageCount,
+			};
+
+			usersRepository.findAndCount.mockResolvedValue([users, total]);
+
+			const name = 'name';
+			const result = await service.searchUsersByName(name);
+
+			const args = {
+				where: [
+					{ firstName: ILike(`%${name}%`) },
+					{ lastName: ILike(`%${name}%`) },
+					{ username: ILike(`%${name}%`) },
+				],
+				take: 20,
+				skip: 0,
+			};
+
+			expect(usersRepository.findAndCount).toHaveBeenCalledWith(args);
+			expect(result).toEqual(response);
 		});
 	});
 });

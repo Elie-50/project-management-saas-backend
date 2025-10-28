@@ -15,9 +15,9 @@ describe('Users E2E', () => {
 	const userDto = {
 		email: 'test@example.com',
 		password: 'password',
-		username: 'testuser',
+		username: 'testx',
 		firstName: 'Test',
-		lastName: 'User',
+		lastName: 'Test',
 	};
 
 	const updatedUserDto = {
@@ -138,6 +138,45 @@ describe('Users E2E', () => {
 
 		it('should return 401 without token', async () => {
 			await request(httpServer).delete(meUrl).expect(401);
+		});
+	});
+
+	describe('GET /params', () => {
+		it('should return the found users with the count and total pages', async () => {
+			// create users
+			for (let i = 0; i < 50; i++) {
+				const data = {
+					username: '',
+					email: '',
+					firstName: '',
+					lastName: '',
+					password: 'password',
+				};
+				if (i % 2 == 0) {
+					data.username = `User${i}`;
+					data.firstName = `FName${i}`;
+					data.lastName = `LName${i}`;
+					data.email = `user${i}@example.com`;
+				} else {
+					data.username = `Test${i}`;
+					data.firstName = `TestFirstName${i}`;
+					data.lastName = `TestLastName${i}`;
+					data.email = `testuser${i}@example.com`;
+				}
+				await dataSource.getRepository(User).save(data);
+			}
+
+			const { token } = await registerAndLogin();
+
+			const res = await request(httpServer)
+				.get(`/users/search?q=user&page=1`)
+				.set('Authorization', `Bearer ${token}`)
+				.expect(200);
+
+			expect(res.body?.data).toBeInstanceOf(Array);
+			expect(res.body?.data.length).toBe(20);
+			expect(res.body?.total).toBe(25);
+			expect(res.body?.pageCount).toBe(2);
 		});
 	});
 });

@@ -33,6 +33,7 @@ describe('UsersController', () => {
 		update: jest.fn(),
 		remove: jest.fn(),
 		findAllMemberships: jest.fn(),
+		searchUsersByName: jest.fn(),
 	};
 
 	const mockMembershipService = {
@@ -128,6 +129,33 @@ describe('UsersController', () => {
 				mockUser.id,
 			);
 			expect(result).toEqual(memberships);
+		});
+	});
+
+	describe('searchUsers', () => {
+		it('should return the found users', async () => {
+			const users = [
+				{ id: '1', email: 'test@example.com' },
+				{ id: '2', email: 'email@example.com' },
+			] as User[];
+
+			const total = 2;
+			const page = 1;
+			const pageCount = 1;
+
+			const response = {
+				data: users,
+				total,
+				page,
+				pageCount,
+			};
+
+			usersService.searchUsersByName.mockResolvedValueOnce(response);
+
+			const result = await controller.searchUsers('name', 1);
+
+			expect(usersService.searchUsersByName).toHaveBeenCalledWith('name', 1);
+			expect(result).toEqual(response);
 		});
 	});
 });

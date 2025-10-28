@@ -8,6 +8,7 @@ import {
 	HttpStatus,
 	UseGuards,
 	Req,
+	Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -53,5 +54,13 @@ export class UsersController {
 	@Get('me/memberships')
 	findMemberships(@Req() req: AuthRequest) {
 		return this.membershipService.findAllMemberships(req.user.id);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthGuard)
+	@Get('search')
+	async searchUsers(@Query('q') q: string, @Query('page') page = 1) {
+		const pageNum = Number(page) || 1;
+		return this.usersService.searchUsersByName(q, pageNum);
 	}
 }

@@ -3,7 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
-import { Repository } from 'typeorm';
+import { ILike, Repository } from 'typeorm';
 
 type SafeUserResponse = Omit<User, 'password'>;
 
@@ -51,5 +51,26 @@ export class UsersService {
 		}
 
 		return this.usersRepository.remove(existing);
+	}
+
+	async searchUsersByName(name: string, page: number = 1) {
+		const take = 20;
+		const skip = (page - 1) * take;
+		const [users, total] = await this.usersRepository.findAndCount({
+			where: [
+				{ firstName: ILike(`%${name}%`) },
+				{ lastName: ILike(`%${name}%`) },
+				{ username: ILike(`%${name}%`) },
+			],
+			take,
+			skip,
+		});
+
+		return {
+			data: users,
+			total,
+			page,
+			pageCount: Math.ceil(total / take),
+		};
 	}
 }
