@@ -86,6 +86,14 @@ describe('UsersService', () => {
 
 			expect(usersRepository.findOne).toHaveBeenCalledWith({
 				where: { id: '1' },
+				select: [
+					'id',
+					'username',
+					'lastName',
+					'firstName',
+					'email',
+					'createdAt',
+				],
 			});
 			expect(result).toEqual(user);
 		});
@@ -164,6 +172,14 @@ describe('UsersService', () => {
 					{ firstName: ILike(`%${name}%`) },
 					{ lastName: ILike(`%${name}%`) },
 					{ username: ILike(`%${name}%`) },
+				],
+				select: [
+					'id',
+					'firstName',
+					'lastName',
+					'username',
+					'email',
+					'createdAt',
 				],
 				take: 20,
 				skip: 0,

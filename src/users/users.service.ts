@@ -23,15 +23,16 @@ export class UsersService {
 	}
 
 	async findById(id: string): Promise<SafeUserResponse> {
-		const user = await this.usersRepository.findOne({ where: { id } });
+		const user = await this.usersRepository.findOne({
+			where: { id },
+			select: ['id', 'username', 'lastName', 'firstName', 'email', 'createdAt'],
+		});
 
 		if (!user) {
 			throw new NotFoundException('User Not Found');
 		}
 
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const { password, ...res } = user;
-		return res;
+		return user;
 	}
 
 	async update(
@@ -62,6 +63,7 @@ export class UsersService {
 				{ lastName: ILike(`%${name}%`) },
 				{ username: ILike(`%${name}%`) },
 			],
+			select: ['id', 'firstName', 'lastName', 'username', 'email', 'createdAt'],
 			take,
 			skip,
 		});
