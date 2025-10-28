@@ -25,7 +25,7 @@ describe('Users E2E', () => {
 		lastName: 'Name',
 	};
 
-	const meUrl = '/users/me';
+	const meUrl = '/api/users/me';
 
 	beforeAll(async () => {
 		const moduleFixture = await Test.createTestingModule({
@@ -51,14 +51,14 @@ describe('Users E2E', () => {
 
 	async function registerAndLogin(): Promise<{ token: string; user: User }> {
 		const signupRes = await request(httpServer)
-			.post('/auth/signup')
+			.post('/api/auth/signup')
 			.send(userDto)
 			.expect(201);
 
 		const user = signupRes.body;
 
 		const loginRes = await request(httpServer)
-			.post('/auth/login')
+			.post('/api/auth/login')
 			.send({ email: userDto.email, password: userDto.password })
 			.expect(200);
 
@@ -169,7 +169,7 @@ describe('Users E2E', () => {
 			const { token } = await registerAndLogin();
 
 			const res = await request(httpServer)
-				.get(`/users/search?q=user&page=1`)
+				.get(`/api/users/search?q=user&page=1`)
 				.set('Authorization', `Bearer ${token}`)
 				.expect(200);
 

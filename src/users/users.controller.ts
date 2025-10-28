@@ -21,7 +21,7 @@ interface AuthRequest extends Request {
 	user: JwtPayload;
 }
 
-@Controller('users')
+@Controller('api/users')
 export class UsersController {
 	constructor(
 		private readonly usersService: UsersService,

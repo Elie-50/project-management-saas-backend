@@ -48,14 +48,14 @@ describe('Membership e2e', () => {
 		};
 
 		const signupRes = await request(httpServer)
-			.post('/auth/signup')
+			.post('/api/auth/signup')
 			.send(userDto)
 			.expect(201);
 
 		const user = signupRes.body;
 
 		const loginRes = await request(httpServer)
-			.post('/auth/login')
+			.post('/api/auth/login')
 			.send({ email: userDto.email, password: userDto.password })
 			.expect(200);
 
@@ -81,7 +81,7 @@ describe('Membership e2e', () => {
 			});
 
 			await request(httpServer)
-				.post(`/organizations/${org.id}/members`)
+				.post(`/api/organizations/${org.id}/members`)
 				.set('Authorization', `Bearer ${token}`)
 				.send({ userId: newUser.id })
 				.expect(201);
@@ -117,7 +117,7 @@ describe('Membership e2e', () => {
 			});
 
 			await request(httpServer)
-				.delete(`/organizations/${org.id}/members/${newUser.id}`)
+				.delete(`/api/organizations/${org.id}/members/${newUser.id}`)
 				.set('Authorization', `Bearer ${token}`)
 				.expect(204);
 
@@ -157,7 +157,7 @@ describe('Membership e2e', () => {
 			});
 
 			const res = await request(httpServer)
-				.get(`/organizations/${org.id}/members`)
+				.get(`/api/organizations/${org.id}/members`)
 				.set('Authorization', `Bearer ${token}`)
 				.expect(200);
 
@@ -184,7 +184,7 @@ describe('Membership e2e', () => {
 			}
 
 			const res = await request(httpServer)
-				.get('/users/me/memberships')
+				.get('/api/users/me/memberships')
 				.set('Authorization', `Bearer ${token}`)
 				.expect(200);
 

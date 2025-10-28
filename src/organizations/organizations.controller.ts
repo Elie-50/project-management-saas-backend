@@ -23,7 +23,7 @@ interface AuthRequest extends Request {
 	user: JwtPayload;
 }
 
-@Controller('organizations')
+@Controller('api/organizations')
 export class OrganizationsController {
 	constructor(
 		private readonly organizationsService: OrganizationsService,

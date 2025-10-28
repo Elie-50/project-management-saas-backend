@@ -13,7 +13,7 @@ describe('Organization E2E', () => {
 	let httpServer: any;
 	let dataSource: DataSource;
 
-	const organizationUrl = '/organizations';
+	const organizationUrl = '/api/organizations';
 
 	beforeAll(async () => {
 		const moduleFixture = await Test.createTestingModule({
@@ -48,14 +48,14 @@ describe('Organization E2E', () => {
 		};
 
 		const signupRes = await request(httpServer)
-			.post('/auth/signup')
+			.post('/api/auth/signup')
 			.send(userDto)
 			.expect(201);
 
 		const user = signupRes.body;
 
 		const loginRes = await request(httpServer)
-			.post('/auth/login')
+			.post('/api/auth/login')
 			.send({ email: userDto.email, password: userDto.password })
 			.expect(200);
 

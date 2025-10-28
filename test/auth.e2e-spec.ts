@@ -20,8 +20,8 @@ describe('Auth E2E', () => {
 		lastName: 'User',
 	};
 
-	const signupUrl = '/auth/signup';
-	const loginUrl = '/auth/login';
+	const signupUrl = '/api/auth/signup';
+	const loginUrl = '/api/auth/login';
 
 	beforeAll(async () => {
 		const moduleFixture = await Test.createTestingModule({
