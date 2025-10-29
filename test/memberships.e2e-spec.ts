@@ -161,8 +161,6 @@ describe('Membership e2e', () => {
 				.set('Authorization', `Bearer ${token}`)
 				.expect(200);
 
-			console.log(res.body);
-
 			expect(res.body.length).toBe(2);
 			expect(res.body[0].id).toBeDefined();
 			expect(res.body[0].username).toBeDefined();

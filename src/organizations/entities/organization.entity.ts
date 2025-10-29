@@ -25,6 +25,6 @@ export class Organization {
 	@OneToMany(() => Membership, (membership) => membership.organization)
 	memberships?: Membership[];
 
-	@CreateDateColumn()
+	@CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
 	createdAt: Date;
 }

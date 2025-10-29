@@ -23,6 +23,6 @@ export class Membership {
 	@JoinColumn({ name: 'organization_id' })
 	organization: Organization;
 
-	@CreateDateColumn({ name: 'joined_at' })
+	@CreateDateColumn({ name: 'joined_at', type: 'timestamptz' })
 	joinedAt: Date;
 }
