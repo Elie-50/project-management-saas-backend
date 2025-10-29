@@ -50,7 +50,7 @@ export class MembershipsService {
 	}
 
 	async findAllMembers(orgId: string) {
-		return await this.membershipRepo
+		return this.membershipRepo
 			.createQueryBuilder('membership')
 			.innerJoin('membership.user', 'user')
 			.where('membership.organization_id = :orgId', { orgId })
@@ -58,7 +58,7 @@ export class MembershipsService {
 				'user.id AS id',
 				'user.username AS username',
 				'user.email as email',
-				'membership.joinedAt as joinedAt',
+				'membership.joinedAt as "joinedAt"',
 			])
 			.orderBy('membership.joinedAt', 'ASC')
 			.getRawMany<OrganizationMember>();

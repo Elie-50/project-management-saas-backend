@@ -29,9 +29,9 @@ describe('Membership e2e', () => {
 	});
 
 	beforeEach(async () => {
-		await dataSource.getRepository(Membership).clear();
-		await dataSource.getRepository(Organization).clear();
-		await dataSource.getRepository(User).clear();
+		await dataSource.query(
+			'TRUNCATE TABLE "memberships", "organizations", "users" RESTART IDENTITY CASCADE;',
+		);
 	});
 
 	afterAll(async () => {
@@ -160,6 +160,8 @@ describe('Membership e2e', () => {
 				.get(`/api/organizations/${org.id}/members`)
 				.set('Authorization', `Bearer ${token}`)
 				.expect(200);
+
+			console.log(res.body);
 
 			expect(res.body.length).toBe(2);
 			expect(res.body[0].id).toBeDefined();

@@ -11,6 +11,22 @@ jobs:
     runs-on: ubuntu-latest
     environment: .env
 
+    services:
+      postgres:
+        image: postgres:16
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpass
+          POSTGRES_DB: testdb
+        # Health check — ensures DB is ready before tests run
+        options: >-
+          --health-cmd "pg_isready -U testuser -d testdb"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     strategy:
       matrix:
         node-version: [22]
@@ -27,10 +43,23 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          until pg_isready -h localhost -p 5432 -U testuser; do
+            echo "Waiting for postgres..."
+            sleep 2
+          done
+
       - name: Run unit tests
         run: npm run test
 
       - name: Run e2e tests
         env:
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          DB_HOST: localhost
+          DB_PORT: 5432
+          DB_USER: testuser
+          DB_PASS: testpass
+          DB_NAME_TEST: testdb
+          SYNCHRONIZE: true
         run: npm run test:e2e

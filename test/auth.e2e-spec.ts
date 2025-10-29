@@ -38,7 +38,9 @@ describe('Auth E2E', () => {
 	});
 
 	beforeEach(async () => {
-		await dataSource.getRepository(User).clear();
+		await dataSource.query(
+			'TRUNCATE TABLE "memberships", "organizations", "users" RESTART IDENTITY CASCADE;',
+		);
 	});
 
 	afterAll(async () => {
