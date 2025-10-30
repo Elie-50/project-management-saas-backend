@@ -9,6 +9,7 @@ import {
 	OneToMany,
 } from 'typeorm';
 import { Membership } from '../../memberships/entities/membership.entity';
+import { Project } from '../../projects/entities/project.entity';
 
 @Entity({ name: 'organizations' })
 export class Organization {
@@ -24,6 +25,9 @@ export class Organization {
 
 	@OneToMany(() => Membership, (membership) => membership.organization)
 	memberships?: Membership[];
+
+	@OneToMany(() => Project, (project) => project.organization)
+	projects?: Project[];
 
 	@CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
 	createdAt: Date;

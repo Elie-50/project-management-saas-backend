@@ -39,7 +39,7 @@ describe('Auth E2E', () => {
 
 	beforeEach(async () => {
 		await dataSource.query(
-			'TRUNCATE TABLE "memberships", "organizations", "users" RESTART IDENTITY CASCADE;',
+			'TRUNCATE TABLE "memberships", "organizations", "users", "projects" RESTART IDENTITY CASCADE;',
 		);
 	});
 

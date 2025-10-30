@@ -30,7 +30,7 @@ describe('Membership e2e', () => {
 
 	beforeEach(async () => {
 		await dataSource.query(
-			'TRUNCATE TABLE "memberships", "organizations", "users" RESTART IDENTITY CASCADE;',
+			'TRUNCATE TABLE "memberships", "organizations", "users", "projects" RESTART IDENTITY CASCADE;',
 		);
 	});
 

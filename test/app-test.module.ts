@@ -8,6 +8,8 @@ import { OrganizationsModule } from '../src/organizations/organizations.module';
 import { Organization } from '../src/organizations/entities/organization.entity';
 import { MembershipsModule } from '../src/memberships/memberships.module';
 import { Membership } from '../src/memberships/entities/membership.entity';
+import { Project } from '../src/projects/entities/project.entity';
+import { ProjectsModule } from '../src/projects/projects.module';
 
 @Module({
 	imports: [
@@ -25,13 +27,14 @@ import { Membership } from '../src/memberships/entities/membership.entity';
 				password: config.get<string>('DB_PASS'),
 				database: config.get<string>('DB_NAME_TEST'),
 				synchronize: config.get<boolean>('SYNCHRONIZE'),
-				entities: [User, Organization, Membership],
+				entities: [User, Organization, Membership, Project],
 			}),
 		}),
 		UsersModule,
 		AuthModule,
 		OrganizationsModule,
 		MembershipsModule,
+		ProjectsModule,
 	],
 	controllers: [],
 	providers: [],

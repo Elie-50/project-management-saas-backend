@@ -7,11 +7,14 @@ import { User } from '../users/entities/user.entity';
 import { JwtService } from '@nestjs/jwt';
 import { Organization } from './entities/organization.entity';
 import { MembershipsService } from '../memberships/memberships.service';
+import { ProjectsService } from '../projects/projects.service';
+import { Project } from '../projects/entities/project.entity';
 
 describe('OrganizationsController', () => {
 	let controller: OrganizationsController;
 	let service: jest.Mocked<OrganizationsService>;
 	let membershipService: jest.Mocked<MembershipsService>;
+	let projectService: jest.Mocked<ProjectsService>;
 
 	const mockUser: User = {
 		id: 'user-id-123',
@@ -42,6 +45,10 @@ describe('OrganizationsController', () => {
 		findAllMembers: jest.fn(),
 	};
 
+	const mockProjectService = {
+		findAll: jest.fn(),
+	};
+
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [OrganizationsController],
@@ -53,6 +60,10 @@ describe('OrganizationsController', () => {
 				{
 					provide: MembershipsService,
 					useValue: mockMembershipService,
+				},
+				{
+					provide: ProjectsService,
+					useValue: mockProjectService,
 				},
 				{
 					provide: JwtService,
@@ -67,6 +78,7 @@ describe('OrganizationsController', () => {
 		controller = module.get<OrganizationsController>(OrganizationsController);
 		service = module.get(OrganizationsService);
 		membershipService = module.get(MembershipsService);
+		projectService = module.get(ProjectsService);
 	});
 
 	afterEach(() => {
@@ -218,6 +230,34 @@ describe('OrganizationsController', () => {
 			await controller.removeMember('org-1', 'user-1');
 
 			expect(membershipService.remove).toHaveBeenCalledWith('org-1', 'user-1');
+		});
+	});
+
+	describe('findAllProjects', () => {
+		it('should return all organization projects', async () => {
+			const expected = [
+				{
+					id: 'id-123',
+					name: 'project',
+					organization: {
+						id: 'id-123',
+						name: 'Org-1',
+					} as Organization,
+				} as Project,
+			];
+
+			const orgId: string = 'org-123';
+
+			projectService.findAll.mockResolvedValue(expected);
+
+			const result = await controller.findAllProjects(mockReq, orgId);
+
+			expect(projectService.findAll).toHaveBeenCalledWith(
+				orgId,
+				mockReq.user.id,
+			);
+
+			expect(result).toEqual(expected);
 		});
 	});
 });

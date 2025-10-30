@@ -18,6 +18,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { JwtPayload } from '../auth/auth.service';
 import { MembershipsService } from '../memberships/memberships.service';
+import { ProjectsService } from '../projects/projects.service';
 
 interface AuthRequest extends Request {
 	user: JwtPayload;
@@ -28,6 +29,7 @@ export class OrganizationsController {
 	constructor(
 		private readonly organizationsService: OrganizationsService,
 		private readonly membershipService: MembershipsService,
+		private readonly projectsService: ProjectsService,
 	) {}
 
 	@HttpCode(HttpStatus.CREATED)
@@ -95,5 +97,15 @@ export class OrganizationsController {
 	@Delete(':orgId/members/:userId')
 	removeMember(@Param('orgId') orgId: string, @Param('userId') userId: string) {
 		return this.membershipService.remove(orgId, userId);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthGuard)
+	@Get(':organizationId/projects')
+	findAllProjects(
+		@Req() req: AuthRequest,
+		@Param('organizationId') organizationId: string,
+	) {
+		return this.projectsService.findAll(organizationId, req.user.id);
 	}
 }
