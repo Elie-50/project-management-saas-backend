@@ -22,6 +22,7 @@ describe('ProjectsService', () => {
 	};
 
 	const mockRepo = {
+		create: jest.fn(),
 		save: jest.fn(),
 		find: jest.fn(),
 		findOne: jest.fn(),
@@ -68,21 +69,46 @@ describe('ProjectsService', () => {
 	describe('create', () => {
 		it('should create a project if user owns the organization', async () => {
 			const dto = { organizationId, name: 'New Project' };
+
+			const org = { id: organizationId } as Organization;
+
 			mockOrganizationsRepository.findOne.mockResolvedValue({
 				id: organizationId,
 			} as Organization);
+
 			mockProjectsRepository.save.mockResolvedValue({
 				id: projectId,
 				...dto,
 			} as unknown as Project);
+
+			const createdProject = {
+				name: 'New Project',
+				organization: { id: organizationId } as Organization,
+			};
+
+			mockProjectsRepository.create.mockReturnValue(createdProject as Project);
 
 			const result = await service.create(dto as any, userId);
 
 			expect(mockOrganizationsRepository.findOne).toHaveBeenCalledWith({
 				where: { id: organizationId, owner: { id: userId } },
 			});
-			expect(mockProjectsRepository.save).toHaveBeenCalledWith(dto);
-			expect(result).toEqual({ id: projectId, ...dto });
+
+			expect(mockProjectsRepository.create).toHaveBeenCalledWith({
+				name: dto.name,
+				organization: org,
+			});
+
+			expect(mockProjectsRepository.save).toHaveBeenCalledWith({
+				name: dto.name,
+				organization: org,
+			});
+
+			expect(result).toEqual({
+				id: projectId,
+				name: dto.name,
+				organizationId: org.id,
+			});
 		});
 
 		it('should throw ForbiddenException if user is not org owner', async () => {

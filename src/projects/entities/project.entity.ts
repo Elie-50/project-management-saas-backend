@@ -3,6 +3,7 @@ import {
 	Column,
 	CreateDateColumn,
 	Entity,
+	JoinColumn,
 	ManyToOne,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -15,6 +16,7 @@ export class Project {
 	@ManyToOne(() => Organization, (organization) => organization.projects, {
 		eager: false,
 	})
+	@JoinColumn({ name: 'organization_id' })
 	organization: Organization;
 
 	@Column({ name: 'name' })

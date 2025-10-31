@@ -35,7 +35,12 @@ export class ProjectsService {
 			);
 		}
 
-		return this.projectsRepository.save(createProjectDto);
+		const project = this.projectsRepository.create({
+			name: createProjectDto.name,
+			organization: org,
+		});
+
+		return this.projectsRepository.save(project);
 	}
 
 	async findAll(organizationId: string, userId: string) {
