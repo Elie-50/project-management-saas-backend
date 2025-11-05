@@ -5,9 +5,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Organization } from '../organizations/entities/organization.entity';
 import { Membership } from '../memberships/entities/membership.entity';
+import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Project, Organization, Membership])],
+	imports: [
+		TypeOrmModule.forFeature([Project, Organization, Membership]),
+		TasksModule,
+	],
 	controllers: [ProjectsController],
 	providers: [ProjectsService],
 	exports: [ProjectsService],

@@ -16,6 +16,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { JwtPayload } from '../auth/auth.service';
+import { TasksService } from '../tasks/tasks.service';
 
 interface AuthRequest extends Request {
 	user: JwtPayload;
@@ -23,7 +24,10 @@ interface AuthRequest extends Request {
 
 @Controller('api/projects')
 export class ProjectsController {
-	constructor(private readonly projectsService: ProjectsService) {}
+	constructor(
+		private readonly projectsService: ProjectsService,
+		private readonly tasksService: TasksService,
+	) {}
 
 	@HttpCode(HttpStatus.CREATED)
 	@UseGuards(AuthGuard)
@@ -55,5 +59,12 @@ export class ProjectsController {
 	@Delete(':id')
 	remove(@Req() req: AuthRequest, @Param('id') id: string) {
 		return this.projectsService.remove(id, req.user.id);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthGuard)
+	@Get(':id/tasks')
+	findAllTasks(@Req() req: AuthRequest, @Param('id') id: string) {
+		return this.tasksService.findAllProjectTasks(id, req.user.id);
 	}
 }

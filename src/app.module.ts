@@ -10,6 +10,8 @@ import { MembershipsModule } from './memberships/memberships.module';
 import { Membership } from './memberships/entities/membership.entity';
 import { ProjectsModule } from './projects/projects.module';
 import { Project } from './projects/entities/project.entity';
+import { TasksModule } from './tasks/tasks.module';
+import { Task } from './tasks/entities/task.entity';
 
 @Module({
 	imports: [
@@ -27,7 +29,7 @@ import { Project } from './projects/entities/project.entity';
 				password: config.get<string>('DB_PASS'),
 				database: config.get<string>('DB_NAME'),
 				synchronize: config.get<boolean>('SYNCHRONIZE'),
-				entities: [User, Organization, Membership, Project],
+				entities: [User, Organization, Membership, Project, Task],
 			}),
 		}),
 		UsersModule,
@@ -35,6 +37,7 @@ import { Project } from './projects/entities/project.entity';
 		OrganizationsModule,
 		MembershipsModule,
 		ProjectsModule,
+		TasksModule,
 	],
 	controllers: [],
 	providers: [],

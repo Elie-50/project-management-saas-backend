@@ -10,6 +10,8 @@ import { MembershipsModule } from '../src/memberships/memberships.module';
 import { Membership } from '../src/memberships/entities/membership.entity';
 import { Project } from '../src/projects/entities/project.entity';
 import { ProjectsModule } from '../src/projects/projects.module';
+import { Task } from '../src/tasks/entities/task.entity';
+import { TasksModule } from '../src/tasks/tasks.module';
 
 @Module({
 	imports: [
@@ -26,8 +28,9 @@ import { ProjectsModule } from '../src/projects/projects.module';
 				username: config.get<string>('DB_USER'),
 				password: config.get<string>('DB_PASS'),
 				database: config.get<string>('DB_NAME_TEST'),
-				synchronize: config.get<boolean>('SYNCHRONIZE'),
-				entities: [User, Organization, Membership, Project],
+				synchronize: true,
+				dropSchema: true,
+				entities: [User, Organization, Membership, Project, Task],
 			}),
 		}),
 		UsersModule,
@@ -35,6 +38,7 @@ import { ProjectsModule } from '../src/projects/projects.module';
 		OrganizationsModule,
 		MembershipsModule,
 		ProjectsModule,
+		TasksModule,
 	],
 	controllers: [],
 	providers: [],

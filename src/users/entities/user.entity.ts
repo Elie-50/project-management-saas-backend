@@ -1,3 +1,4 @@
+import { Task } from '../../tasks/entities/task.entity';
 import { Membership } from '../../memberships/entities/membership.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
 import {
@@ -36,6 +37,9 @@ export class User {
 
 	@OneToMany(() => Membership, (membership) => membership.user)
 	memberships?: Membership[];
+
+	@OneToMany(() => Task, (task) => task.assignee)
+	tasks?: Task[];
 
 	@CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
 	createdAt: Date;

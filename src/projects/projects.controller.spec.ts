@@ -3,16 +3,23 @@ import { ProjectsController } from './projects.controller';
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { JwtService } from '@nestjs/jwt';
+import { TasksService } from '../tasks/tasks.service';
+import { Task } from '../tasks/entities/task.entity';
 
 describe('ProjectsController', () => {
 	let controller: ProjectsController;
-	let service: ProjectsService;
+	let service: jest.Mocked<ProjectsService>;
+	let tasksService: jest.Mocked<TasksService>;
 
 	const mockProjectsService = {
 		create: jest.fn(),
 		findOne: jest.fn(),
 		update: jest.fn(),
 		remove: jest.fn(),
+	};
+
+	const mockTasksService = {
+		findAllProjectTasks: jest.fn(),
 	};
 
 	const user = { id: 'user-1' };
@@ -28,6 +35,10 @@ describe('ProjectsController', () => {
 					useValue: mockProjectsService,
 				},
 				{
+					provide: TasksService,
+					useValue: mockTasksService,
+				},
+				{
 					provide: JwtService,
 					useValue: {
 						verifyAsync: jest.fn(),
@@ -38,7 +49,8 @@ describe('ProjectsController', () => {
 		}).compile();
 
 		controller = module.get<ProjectsController>(ProjectsController);
-		service = module.get<ProjectsService>(ProjectsService);
+		service = module.get(ProjectsService);
+		tasksService = module.get(TasksService);
 	});
 
 	it('should be defined', () => {
@@ -99,6 +111,25 @@ describe('ProjectsController', () => {
 
 			expect(service.remove).toHaveBeenCalledWith(projectId, user.id);
 			expect(result).toEqual(deletedProject);
+		});
+	});
+
+	describe('findAllTasks', () => {
+		it('should call tasks service find tasks', async () => {
+			const tasks = [
+				{
+					id: 'id-123',
+				},
+			] as Task[];
+			tasksService.findAllProjectTasks.mockResolvedValueOnce(tasks);
+			const projectId = '123';
+			const result = await controller.findAllTasks(req, projectId);
+
+			expect(tasksService.findAllProjectTasks).toHaveBeenCalledWith(
+				projectId,
+				req.user.id,
+			);
+			expect(result).toEqual(tasks);
 		});
 	});
 });

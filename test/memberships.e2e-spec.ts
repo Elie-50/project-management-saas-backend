@@ -29,9 +29,12 @@ describe('Membership e2e', () => {
 	});
 
 	beforeEach(async () => {
-		await dataSource.query(
-			'TRUNCATE TABLE "memberships", "organizations", "users", "projects" RESTART IDENTITY CASCADE;',
+		const entities = dataSource.entityMetadatas.map(
+			(meta) => `"${meta.tableName}"`,
 		);
+		const tables = entities.join(', ');
+
+		await dataSource.query(`TRUNCATE ${tables} RESTART IDENTITY CASCADE;`);
 	});
 
 	afterAll(async () => {

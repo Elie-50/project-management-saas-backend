@@ -1,3 +1,4 @@
+import { Task } from '../../tasks/entities/task.entity';
 import { Organization } from '../../organizations/entities/organization.entity';
 import {
 	Column,
@@ -5,6 +6,7 @@ import {
 	Entity,
 	JoinColumn,
 	ManyToOne,
+	OneToMany,
 	PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -21,6 +23,9 @@ export class Project {
 
 	@Column({ name: 'name' })
 	name: string;
+
+	@OneToMany(() => Task, (task) => task.project)
+	tasks?: Task[];
 
 	@CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
 	createdAt: Date;

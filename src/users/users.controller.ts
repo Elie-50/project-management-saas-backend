@@ -9,6 +9,7 @@ import {
 	UseGuards,
 	Req,
 	Query,
+	Param,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -16,6 +17,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { Request } from 'express';
 import { JwtPayload } from '../auth/auth.service';
 import { MembershipsService } from '../memberships/memberships.service';
+import { TasksService } from '../tasks/tasks.service';
 
 interface AuthRequest extends Request {
 	user: JwtPayload;
@@ -26,6 +28,7 @@ export class UsersController {
 	constructor(
 		private readonly usersService: UsersService,
 		private readonly membershipService: MembershipsService,
+		private readonly tasksService: TasksService,
 	) {}
 
 	@HttpCode(HttpStatus.OK)
@@ -62,5 +65,12 @@ export class UsersController {
 	async searchUsers(@Query('q') q: string, @Query('page') page = 1) {
 		const pageNum = Number(page) || 1;
 		return this.usersService.searchUsersByName(q, pageNum);
+	}
+
+	@HttpCode(HttpStatus.OK)
+	@UseGuards(AuthGuard)
+	@Get('me/projects/:id/tasks')
+	findAllTasks(@Req() req: AuthRequest, @Param('id') id: string) {
+		return this.tasksService.findAllUsersTasks(req.user.id, id);
 	}
 }
