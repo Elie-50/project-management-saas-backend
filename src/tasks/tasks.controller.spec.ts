@@ -3,7 +3,7 @@ import { TasksController } from './tasks.controller';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { TaskStatus, TaskColor } from './entities/task.entity';
+import { TaskStatus } from './entities/task.entity';
 import { JwtService } from '@nestjs/jwt';
 
 describe('TasksController', () => {
@@ -59,7 +59,7 @@ describe('TasksController', () => {
 				projectId: 'proj-1',
 				assigneeId: 'user-2',
 				status: TaskStatus.TODO,
-				color: TaskColor.BLUE,
+				color: '#ff00ff',
 				dueDate: new Date().toISOString(),
 			};
 

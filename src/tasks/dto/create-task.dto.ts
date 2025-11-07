@@ -6,8 +6,9 @@ import {
 	IsUUID,
 	MaxLength,
 	IsDateString,
+	Length,
 } from 'class-validator';
-import { TaskStatus, TaskColor } from '../entities/task.entity';
+import { TaskStatus } from '../entities/task.entity';
 
 export class CreateTaskDto {
 	@IsString()
@@ -30,9 +31,10 @@ export class CreateTaskDto {
 	@IsOptional()
 	status?: TaskStatus;
 
-	@IsEnum(TaskColor)
+	@IsString()
+	@Length(7, 7)
 	@IsOptional()
-	color?: TaskColor;
+	color?: string;
 
 	@IsDateString()
 	@IsNotEmpty()

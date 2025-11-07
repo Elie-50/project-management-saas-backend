@@ -16,21 +16,6 @@ export enum TaskStatus {
 	DONE = 'Done',
 }
 
-export enum TaskColor {
-	RED = 'red',
-	BLUE = 'blue',
-	GREEN = 'green',
-	YELLOW = 'yellow',
-	ORGANE = 'orange',
-	PURPLE = 'purple',
-	AMBER = 'amber',
-	CYAN = 'cyan',
-	LIME = 'lime',
-	PINK = 'pink',
-	ROSE = 'rose',
-	TEAL = 'teal',
-}
-
 @Entity({ name: 'tasks' })
 export class Task {
 	@PrimaryGeneratedColumn('uuid')
@@ -57,12 +42,8 @@ export class Task {
 	})
 	status: TaskStatus;
 
-	@Column({
-		type: 'enum',
-		enum: TaskColor,
-		default: TaskColor.BLUE,
-	})
-	color: TaskColor;
+	@Column({ length: 7, default: '#ffffff' })
+	color: string;
 
 	@CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
 	createdAt: Date;

@@ -151,7 +151,7 @@ describe('Tasks E2E', () => {
 
 			expect(res.body).toBeInstanceOf(Array);
 			expect(res.body.length).toBe(10);
-			expect(res.body[0]?.color).toBe('blue');
+			expect(res.body[0]?.color).toBe('#ffffff');
 			expect(res.body[0]?.status).toBe('To Do');
 		});
 	});
@@ -505,7 +505,7 @@ describe('Tasks E2E', () => {
 				const { task, ownerToken } = await createInitialData(true);
 
 				const updateDto = {
-					color: 'green',
+					color: '#ff00ff',
 					name: 'new name',
 					description: 'A new description',
 				};
@@ -516,7 +516,7 @@ describe('Tasks E2E', () => {
 					.send(updateDto)
 					.expect(200);
 
-				expect(res.body.color).toBe('green');
+				expect(res.body.color).toBe('#ff00ff');
 				expect(res.body.name).toBe('new name');
 				expect(res.body.description).toBe('A new description');
 				expect(res.body.status).toBe('To Do');
@@ -531,7 +531,7 @@ describe('Tasks E2E', () => {
 				expect(dbInstance?.status).toBe('To Do');
 				expect(dbInstance?.name).toBe('new name');
 				expect(dbInstance?.description).toBe('A new description');
-				expect(dbInstance?.color).toBe('green');
+				expect(dbInstance?.color).toBe('#ff00ff');
 			});
 		});
 	});
