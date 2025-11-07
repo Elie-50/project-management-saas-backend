@@ -296,12 +296,23 @@ describe('TasksService', () => {
 
 			const result = await service.findAllProjectTasks('project-1', 'user-1');
 
+			// Should query project ownership
 			expect(projectRepo.findOne).toHaveBeenCalled();
+
+			// Should join assignee info for owner
+			expect(mockQueryBuilder.leftJoinAndSelect).toHaveBeenCalledWith(
+				'task.assignee',
+				'assignee',
+			);
+			expect(mockQueryBuilder.select).toHaveBeenCalled();
+
+			// Should not restrict to one user
 			expect(mockQueryBuilder.andWhere).not.toHaveBeenCalled();
+
 			expect(result).toEqual([{ id: 'task-1' }]);
 		});
 
-		it('should return only assignee tasks for member', async () => {
+		it("should return only user's own tasks for non-owner", async () => {
 			const project = {
 				id: 'project-1',
 				organization: { id: 'org-1', owner: { id: 'owner-1' } },
@@ -317,23 +328,29 @@ describe('TasksService', () => {
 			};
 
 			projectRepo.findOne.mockResolvedValue(project);
-			membershipRepo.findOne.mockResolvedValue({
-				id: 'membership-1',
-			} as Membership);
+			membershipRepo.findOne.mockResolvedValue({ id: 'membership-1' } as any);
 			taskRepo.createQueryBuilder.mockReturnValue(mockQueryBuilder);
 
 			const result = await service.findAllProjectTasks('project-1', 'member-1');
 
+			// Should validate membership
 			expect(membershipRepo.findOne).toHaveBeenCalledWith({
 				where: {
 					user: { id: 'member-1' },
 					organization: { id: 'org-1' },
 				},
 			});
+
+			// Should NOT join assignee info for non-owner
+			expect(mockQueryBuilder.leftJoinAndSelect).not.toHaveBeenCalled();
+			expect(mockQueryBuilder.select).not.toHaveBeenCalled();
+
+			// Should restrict tasks to userId
 			expect(mockQueryBuilder.andWhere).toHaveBeenCalledWith(
-				'assignee.id = :userId',
+				'task.assignee_id = :userId',
 				{ userId: 'member-1' },
 			);
+
 			expect(result).toEqual([{ id: 'task-1' }]);
 		});
 
@@ -357,27 +374,6 @@ describe('TasksService', () => {
 			await expect(
 				service.findAllProjectTasks('invalid', 'user-1'),
 			).rejects.toThrow(NotFoundException);
-		});
-	});
-
-	describe('findAllUsersTasks', () => {
-		it('should return tasks assigned to the user in the project', async () => {
-			const tasks = [
-				{ id: 'task-1', name: 'T1' },
-				{ id: 'task-2', name: 'T2' },
-			];
-
-			taskRepo.find.mockResolvedValue(tasks as Task[]);
-
-			const result = await service.findAllUsersTasks('user-1', 'project-1');
-
-			expect(taskRepo.find).toHaveBeenCalledWith({
-				where: {
-					project: { id: 'project-1' },
-					assignee: { id: 'user-1' },
-				},
-			});
-			expect(result).toEqual(tasks);
 		});
 	});
 });

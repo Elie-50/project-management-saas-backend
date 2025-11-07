@@ -18,14 +18,6 @@ describe('Tasks E2E', () => {
 	let httpServer: any;
 	let dataSource: DataSource;
 
-	const userDto = {
-		email: 'test@example.com',
-		password: 'password',
-		username: 'testx',
-		firstName: 'Test',
-		lastName: 'Test',
-	};
-
 	const ownerDto = {
 		email: 'owner@example.com',
 		password: 'password',
@@ -97,65 +89,6 @@ describe('Tasks E2E', () => {
 		return { token, user };
 	}
 
-	describe("User's tasks", () => {
-		it('should allow user to see their tasks if they own the organization or are members', async () => {
-			// create a user and give them token
-			const { token, user } = await registerAndLogin(userDto);
-
-			// create an organization
-			const org1 = await dataSource.getRepository(Organization).save({
-				name: 'org1',
-				owner: user,
-			});
-
-			//create a project
-			const proj1 = await dataSource.getRepository(Project).save({
-				organization: org1,
-				name: 'proj1',
-			});
-
-			// create tasks
-			for (let i = 0; i < 10; i++) {
-				await dataSource.getRepository(Task).save({
-					name: `Task-${i}`,
-					description: 'desc',
-					assignee: user,
-					project: proj1,
-					dueDate: new Date(),
-				});
-			}
-
-			const otherUser = await dataSource.getRepository(User).save({
-				email: 'assignee@example.com',
-				username: 'assignee',
-				password: 'password',
-				firstName: 'Assignee',
-				lastName: 'User',
-			});
-
-			for (let i = 0; i < 10; i++) {
-				await dataSource.getRepository(Task).save({
-					name: `Task-2-${i}`,
-					description: 'description',
-					assignee: otherUser,
-					project: proj1,
-					dueDate: new Date(),
-				});
-			}
-
-			// check response
-			const res = await request(httpServer)
-				.get(`/api/users/me/projects/${proj1.id}/tasks`)
-				.set('Authorization', `Bearer ${token}`)
-				.expect(200);
-
-			expect(res.body).toBeInstanceOf(Array);
-			expect(res.body.length).toBe(10);
-			expect(res.body[0]?.color).toBe('#ffffff');
-			expect(res.body[0]?.status).toBe('To Do');
-		});
-	});
-
 	describe("Project's tasks", () => {
 		it("should allow user to see the project's tasks if they are owner or member only", async () => {
 			// Register and login main user (organization owner)
@@ -222,6 +155,7 @@ describe('Tasks E2E', () => {
 
 			expect(memberRes.body).toBeInstanceOf(Array);
 			expect(memberRes.body.length).toBe(5);
+			expect(memberRes.body[0].assignee).toBeUndefined();
 
 			// Outsider (not in org) should be forbidden
 			await request(httpServer)

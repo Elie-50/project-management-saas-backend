@@ -9,7 +9,8 @@ import { Organization } from '../organizations/entities/organization.entity';
 type OrganizationMember = {
 	id: string;
 	username: string;
-	email: string;
+	firstName: string;
+	lastName: string;
 	joinedAt: Date;
 };
 
@@ -57,7 +58,8 @@ export class MembershipsService {
 			.select([
 				'user.id AS id',
 				'user.username AS username',
-				'user.email as email',
+				'user.firstName as "firstName"',
+				'user.lastName as "lastName"',
 				'membership.joinedAt as "joinedAt"',
 			])
 			.orderBy('membership.joinedAt', 'ASC')

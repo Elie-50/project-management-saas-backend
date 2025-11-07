@@ -7,14 +7,11 @@ import { JwtService } from '@nestjs/jwt';
 import { MembershipsService } from '../memberships/memberships.service';
 import { Organization } from '../organizations/entities/organization.entity';
 import { Membership } from '../memberships/entities/membership.entity';
-import { TasksService } from '../tasks/tasks.service';
-import { Task } from '../tasks/entities/task.entity';
 
 describe('UsersController', () => {
 	let controller: UsersController;
 	let usersService: jest.Mocked<UsersService>;
 	let membershipsService: jest.Mocked<MembershipsService>;
-	let tasksService: jest.Mocked<TasksService>;
 
 	const mockUser: User = {
 		id: 'user-id-123',
@@ -43,10 +40,6 @@ describe('UsersController', () => {
 		findAllMemberships: jest.fn(),
 	};
 
-	const mockTasksService = {
-		findAllUsersTasks: jest.fn(),
-	};
-
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
 			controllers: [UsersController],
@@ -58,10 +51,6 @@ describe('UsersController', () => {
 				{
 					provide: MembershipsService,
 					useValue: mockMembershipService,
-				},
-				{
-					provide: TasksService,
-					useValue: mockTasksService,
 				},
 				{
 					provide: JwtService,
@@ -76,7 +65,6 @@ describe('UsersController', () => {
 		controller = module.get<UsersController>(UsersController);
 		usersService = module.get(UsersService);
 		membershipsService = module.get(MembershipsService);
-		tasksService = module.get(TasksService);
 	});
 
 	it('should be defined', () => {
@@ -168,25 +156,6 @@ describe('UsersController', () => {
 
 			expect(usersService.searchUsersByName).toHaveBeenCalledWith('name', 1);
 			expect(result).toEqual(response);
-		});
-	});
-
-	describe('findAllUsersTasks', () => {
-		it('should call tasks service find tasks', async () => {
-			const tasks = [
-				{
-					id: 'id-123',
-				},
-			] as Task[];
-			tasksService.findAllUsersTasks.mockResolvedValueOnce(tasks);
-			const projectId = '123';
-			const result = await controller.findAllTasks(mockRequest, projectId);
-
-			expect(tasksService.findAllUsersTasks).toHaveBeenCalledWith(
-				mockUser.id,
-				projectId,
-			);
-			expect(result).toEqual(tasks);
 		});
 	});
 });

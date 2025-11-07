@@ -96,32 +96,24 @@ export class TasksService {
 		// Base query
 		const qb = this.taskRepository
 			.createQueryBuilder('task')
-			.leftJoinAndSelect('task.assignee', 'assignee')
 			.where('task.project_id = :projectId', { projectId })
-			.select([
+			.orderBy('task.createdAt', 'DESC');
+
+		// Restrict to user's own tasks if not owner
+		if (!isOwner) {
+			qb.andWhere('task.assignee_id = :userId', { userId });
+		} else {
+			// If owner, join assignee info
+			qb.leftJoinAndSelect('task.assignee', 'assignee').select([
 				'task',
 				'assignee.id',
 				'assignee.username',
 				'assignee.firstName',
 				'assignee.lastName',
-			])
-			.orderBy('task.createdAt', 'DESC');
-
-		// Restrict to user's own tasks if not owner
-		if (!isOwner) {
-			qb.andWhere('assignee.id = :userId', { userId });
+			]);
 		}
 
 		return qb.getMany();
-	}
-
-	findAllUsersTasks(userId: string, projectId: string) {
-		return this.taskRepository.find({
-			where: {
-				project: { id: projectId },
-				assignee: { id: userId },
-			},
-		});
 	}
 
 	async findOne(id: string, userId: string) {
