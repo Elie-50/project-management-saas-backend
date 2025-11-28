@@ -16,6 +16,7 @@ import { Task } from './tasks/entities/task.entity';
 @Module({
 	imports: [
 		ConfigModule.forRoot({
+			ignoreEnvFile: true,
 			isGlobal: true,
 		}),
 		TypeOrmModule.forRootAsync({
